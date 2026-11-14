@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>거래내역 - 연습뱅크</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/history.js"></script>
+</head>
+<body>
+  <div class="app">
+    <header class="header" style="background:var(--surface)">
+      <a class="icon-btn header__back" href="index.html" data-icon="back" aria-label="홈으로"></a>
+      <h1 class="header__title">거래내역조회</h1>
+    </header>
+
+    <section class="history-head">
+      <label class="acct-line__label" for="account">내 계좌</label>
+      <select class="select" id="account"></select>
+      <p class="account__balance" id="balance" style="margin:16px 0 0"></p>
+      <div class="account__actions">
+        <button class="btn btn--line" id="fill">채우기</button>
+        <a class="btn btn--primary" id="go-transfer" href="transfer.html">이체</a>
+      </div>
+    </section>
+
+    <div class="filter-bar">
+      <span id="count"></span>
+      <button id="open-filter" aria-haspopup="dialog"><span id="filter-label"></span> <span data-icon="down"></span></button>
+    </div>
+    <p class="period" id="period"></p>
+    <ul class="tx-list" id="list" aria-live="polite"></ul>
+  </div>
+
+  <!-- 조회 조건 바텀시트 -->
+  <dialog class="sheet" id="filter-sheet">
+    <form method="dialog">
+      <h3>조회 조건</h3>
+      <h4>기간</h4>
+      <div class="chips" data-group="days">
+        <button type="button" class="chip" data-value="7">1주일</button>
+        <button type="button" class="chip" data-value="30">1개월</button>
+        <button type="button" class="chip" data-value="90">3개월</button>
+        <button type="button" class="chip" data-value="365">1년</button>
+      </div>
+      <h4>유형</h4>
+      <div class="chips" data-group="type">
+        <button type="button" class="chip" data-value="all">전체</button>
+        <button type="button" class="chip" data-value="deposit">입금</button>
+        <button type="button" class="chip" data-value="withdraw">출금</button>
+      </div>
+      <h4>정렬</h4>
+      <div class="chips" data-group="order">
+        <button type="button" class="chip" data-value="desc">최신순</button>
+        <button type="button" class="chip" data-value="asc">과거순</button>
+      </div>
+      <button class="btn btn--primary btn--block" value="apply">확인</button>
+    </form>
+  </dialog>
+
+  <!-- 채우기 바텀시트 -->
+  <dialog class="sheet" id="fill-sheet">
+    <form method="dialog">
+      <h3>얼마를 채울까요?</h3>
+      <label class="sr-only" for="fill-amount">채울 금액</label>
+      <input class="input-line" id="fill-amount" inputmode="numeric" placeholder="금액 입력" style="margin-top:16px">
+      <p class="field__hint" id="fill-hint"></p>
+      <button class="btn btn--primary btn--block" value="apply">채우기</button>
+    </form>
+  </dialog>
+</body>
+</html>

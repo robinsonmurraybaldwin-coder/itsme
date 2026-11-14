@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>이체 - 연습뱅크</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/transfer.js"></script>
+</head>
+<body>
+  <div class="app app--plain">
+    <header class="header">
+      <button class="icon-btn header__back" id="back" aria-label="뒤로"></button>
+      <h1 class="header__title">이체</h1>
+      <a class="header__right" href="index.html">취소</a>
+    </header>
+
+    <main class="page">
+      <!-- 1단계: 받는 계좌 -->
+      <form class="step is-active" id="step-to" novalidate>
+        <div class="acct-line">
+          <label class="acct-line__label" for="from">내 계좌에서</label>
+          <select class="select" id="from" style="margin-top:6px"></select>
+          <p class="acct-line__sub" id="from-balance"></p>
+        </div>
+
+        <div class="field">
+          <label class="field__label" for="bank">받는 분 은행</label>
+          <select class="select" id="bank"></select>
+        </div>
+        <div class="field">
+          <label class="field__label" for="number">계좌번호</label>
+          <input class="input-line" id="number" inputmode="numeric" autocomplete="off" placeholder="숫자만 입력">
+          <p class="field__hint" id="number-hint"></p>
+        </div>
+
+        <section class="recent" aria-labelledby="recent-title">
+          <h2 class="section__title" id="recent-title">최근 보낸 계좌</h2>
+          <ul id="recent"></ul>
+        </section>
+
+        <div class="bottom-cta"><button class="btn btn--primary btn--block" disabled>다음</button></div>
+      </form>
+
+      <!-- 2단계: 금액 -->
+      <form class="step" id="step-amount" novalidate>
+        <div class="acct-line">
+          <p class="acct-line__label">내 계좌에서</p>
+          <p class="acct-line__value" id="sum-from"></p>
+          <p class="acct-line__sub" id="sum-from-balance"></p>
+        </div>
+        <div class="acct-line" style="margin-top:20px">
+          <p class="acct-line__label" id="sum-to-name"></p>
+          <p class="acct-line__value"><span id="sum-to"></span> <button type="button" class="link" data-goto="step-to">변경</button></p>
+        </div>
+
+        <div class="field">
+          <label class="sr-only" for="amount">보낼 금액</label>
+          <input class="input-line" id="amount" inputmode="numeric" autocomplete="off" placeholder="얼마를 보낼까요?">
+          <p class="field__hint" id="amount-hint"></p>
+          <div class="chips">
+            <button type="button" class="chip" data-add="10000">+1만</button>
+            <button type="button" class="chip" data-add="50000">+5만</button>
+            <button type="button" class="chip" data-add="100000">+10만</button>
+            <button type="button" class="chip" data-add="1000000">+100만</button>
+            <button type="button" class="chip" data-add="all">전액</button>
+          </div>
+        </div>
+
+        <label class="check"><input type="checkbox" id="reserve"> 예약이체</label>
+
+        <div class="bottom-cta"><button class="btn btn--primary btn--block" disabled>다음</button></div>
+      </form>
+
+      <!-- 3단계: 확인 -->
+      <form class="step" id="step-confirm" novalidate>
+        <div class="confirm__head">
+          <div class="confirm__badges" id="cf-badges"></div>
+          <p class="confirm__name" id="cf-name"></p>
+          <p class="confirm__account" id="cf-account"></p>
+          <p class="confirm__amount" id="cf-amount"></p>
+        </div>
+
+        <div class="rows">
+          <div class="row">
+            <span class="row__label">출금계좌</span>
+            <span class="row__value" id="cf-from"></span>
+          </div>
+          <div class="row">
+            <label class="row__label" for="my-memo">내 통장 표기</label>
+            <input id="my-memo" maxlength="10">
+          </div>
+          <div class="row">
+            <span class="row__label">받는 분 통장 표기</span>
+            <span class="row__value">연습사용자</span>
+          </div>
+        </div>
+
+        <div class="bottom-cta"><button class="btn btn--primary btn--block">보내기</button></div>
+      </form>
+
+      <!-- 4단계: 완료 -->
+      <section class="step" id="step-done">
+        <div class="done">
+          <div class="done__icon" id="done-icon"></div>
+          <h2 id="done-title"></h2>
+          <p id="done-desc"></p>
+        </div>
+        <div class="bottom-cta" style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <a class="btn btn--line" id="done-history" href="history.html">내역 보기</a>
+          <a class="btn btn--primary" href="index.html">확인</a>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
