@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>이체결과조회 - 연습뱅크</title>
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem("theme")||""}catch(e){}</script>
+  <link rel="stylesheet" href="css/style.css">
+  <script type="module" src="js/result.js"></script>
+</head>
+<body>
+  <div class="app app--plain">
+    <header class="header">
+      <button class="icon-btn header__back" id="back" data-icon="back" aria-label="뒤로"></button>
+      <h1 class="header__title">이체결과조회</h1>
+      <a class="icon-btn" href="menu.html" data-icon="menu" aria-label="전체메뉴"></a>
+    </header>
+
+    <!-- 목록 화면 -->
+    <div id="view-list">
+      <div class="page" style="padding-top:12px;padding-bottom:16px">
+        <label class="sr-only" for="account">계좌 선택</label>
+        <select class="select" id="account"><option value="">🏛 전체계좌</option></select>
+      </div>
+      <div class="filter-bar" style="margin-top:0;border-top:8px solid var(--bg)">
+        <button id="open-filter" aria-haspopup="dialog"><span id="filter-label"></span><span data-icon="down"></span></button>
+        <button class="icon-btn" id="toggle-search" data-icon="search" aria-label="받는 분 검색" aria-expanded="false"></button>
+      </div>
+      <div class="search-bar" id="search-bar" hidden>
+        <div class="input-box" style="height:46px"><input id="search" placeholder="받는 분 이름 검색" aria-label="받는 분 이름 검색"></div>
+      </div>
+      <p class="period" id="period"></p>
+      <ul class="tx-list" id="list" aria-live="polite"></ul>
+    </div>
+
+    <!-- 이체확인증 화면 -->
+    <div id="view-receipt" hidden>
+      <article class="page receipt" id="receipt" style="padding-bottom:120px"></article>
+      <div class="bottom-cta"><button class="btn btn--primary btn--block" id="share-receipt">공유하기</button></div>
+    </div>
+  </div>
+</body>
+</html>
