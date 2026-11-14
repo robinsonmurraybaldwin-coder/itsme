@@ -32,7 +32,9 @@ python3 -m http.server 8000
 
 ## 계좌 데이터: 로컬 모드 / Supabase 모드
 
-- **로컬 모드 (기본)**: `js/config.js`가 비어 있으면 브라우저 `localStorage`에 저장합니다.
+현재 `js/config.js`에 Supabase 프로젝트가 연결되어 있습니다.
+
+- **로컬 모드**: `js/config.js`의 URL과 키를 비우면 브라우저 `localStorage`에 저장합니다.
   처음 상태로 되돌리려면 개발자도구 콘솔에서 `localStorage.clear()`를 실행하세요.
 - **Supabase 모드**
   1. supabase.com 에서 무료 프로젝트를 만듭니다.
@@ -67,6 +69,5 @@ python3 -m http.server 8000
 
 ## 남은 과제
 
-1. Supabase 프로젝트를 만들어 `js/config.js`에 연결하기 (위 "Supabase 모드" 참고)
-2. Supabase Auth로 로그인을 붙이고 RLS를 `auth.uid()` 기준으로 바꾸기
+1. Supabase Auth로 로그인을 붙이고 RLS를 `auth.uid()` 기준으로 바꾸기
    (지금은 로그인 없는 연습용이라 anon 키만 있으면 누구나 데이터를 읽을 수 있어요)
