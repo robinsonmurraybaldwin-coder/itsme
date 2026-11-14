@@ -6,62 +6,297 @@
   <title>연습뱅크</title>
   <script>try{document.documentElement.dataset.theme=localStorage.getItem("theme")||""}catch(e){}</script>
   <link rel="stylesheet" href="css/style.css">
-  <script type="module" src="js/home.js"></script>
+  <script type="module" src="js/app.js"></script>
 </head>
 <body>
-  <div class="app">
-    <header class="header">
-      <h1 class="header__logo">연습뱅크</h1>
-      <button class="icon-btn" data-icon="bell" data-soon="새 알림이 없어요." aria-label="알림"></button>
-      <button class="icon-btn" data-icon="headset" data-soon="고객센터 연결은 준비 중이에요." aria-label="고객센터"></button>
-      <a class="icon-btn" href="menu.html" data-icon="menu" aria-label="전체메뉴"></a>
-    </header>
+  <!--
+    한 페이지 앱(SPA): 화면 5개가 아래 <template> 에 들어 있고,
+    js/app.js 가 주소의 #/이름 을 보고 해당 화면을 #root 에 그립니다.
+    예) #/home, #/transfer?from=1, #/result?id=5
+  -->
+  <div id="root"></div>
 
-    <main class="page">
-      <div class="home-grid">
-        <div>
-          <div class="banner">
-            <strong>연습뱅크 첫 이체하고<br>나만의 통장 꾸미기!</strong>
-            <span class="banner__emoji" aria-hidden="true">🐣</span>
+  <!-- ===== home ===== -->
+  <template id="tpl-home">
+    <div class="app">
+      <header class="header">
+        <h1 class="header__logo">연습뱅크</h1>
+        <button class="icon-btn" data-icon="bell" data-soon="새 알림이 없어요." aria-label="알림"></button>
+        <button class="icon-btn" data-icon="headset" data-soon="고객센터 연결은 준비 중이에요." aria-label="고객센터"></button>
+        <a class="icon-btn" href="#/menu" data-icon="menu" aria-label="전체메뉴"></a>
+      </header>
+
+      <main class="page">
+        <div class="home-grid">
+          <div>
+            <div class="banner">
+              <strong>연습뱅크 첫 이체하고<br>나만의 통장 꾸미기!</strong>
+              <span class="banner__emoji" aria-hidden="true">🐣</span>
+            </div>
+
+            <div class="home-tabs" role="tablist">
+              <button class="home-tabs__btn is-active" role="tab" aria-selected="true" data-tab="mine">
+                <span class="bank-badge" style="width:18px;height:18px;font-size:10px">연</span>연습뱅크
+              </button>
+              <button class="home-tabs__btn" role="tab" aria-selected="false" data-tab="other">다른금융</button>
+              <button class="home-tabs__easy" data-soon="쉬운뱅킹은 준비 중이에요.">가 쉬운뱅킹</button>
+            </div>
+
+            <section aria-label="내 계좌">
+              <div class="carousel" id="accounts"><div class="skeleton skeleton--card"></div></div>
+              <div class="dots" id="dots"></div>
+            </section>
+
+            <div class="quick">
+              <a href="#/result">💬 최근 이체내역 <span data-icon="right"></span></a>
+              <a href="#" data-soon>🪪 신분증·지갑 <span data-icon="right"></span></a>
+            </div>
           </div>
 
-          <div class="home-tabs" role="tablist">
-            <button class="home-tabs__btn is-active" role="tab" aria-selected="true" data-tab="mine">
-              <span class="bank-badge" style="width:18px;height:18px;font-size:10px">연</span>연습뱅크
-            </button>
-            <button class="home-tabs__btn" role="tab" aria-selected="false" data-tab="other">다른금융</button>
-            <button class="home-tabs__easy" data-soon="쉬운뱅킹은 준비 중이에요.">가 쉬운뱅킹</button>
-          </div>
+          <div>
+            <section class="section">
+              <h2 class="section__title">나만의 맞춤메뉴</h2>
+              <div class="menu-grid">
+                <a href="#/history"><span class="menu-grid__icon">📒</span>거래내역조회</a>
+                <a href="#/result"><span class="menu-grid__icon">🧾</span>이체결과조회</a>
+                <a href="#/transfer"><span class="menu-grid__icon">💸</span>이체</a>
+                <a href="#/menu"><span class="menu-grid__icon">➕</span>추가</a>
+              </div>
+            </section>
 
-          <section aria-label="내 계좌">
-            <div class="carousel" id="accounts"><div class="skeleton skeleton--card"></div></div>
-            <div class="dots" id="dots"></div>
-          </section>
-
-          <div class="quick">
-            <a href="result.html">💬 최근 이체내역 <span data-icon="right"></span></a>
-            <a href="#" data-soon>🪪 신분증·지갑 <span data-icon="right"></span></a>
+            <a class="promo" href="#" data-soon>
+              <span><small>연습뱅크 × 연습증권</small><strong>계좌 개설하고 주식 받기</strong></span>
+              <span aria-hidden="true" style="font-size:32px">🎁</span>
+            </a>
           </div>
         </div>
+      </main>
+    </div>
+  </template>
+  <!-- ===== transfer ===== -->
+  <template id="tpl-transfer">
+    <div class="app app--plain">
+      <header class="header">
+        <button class="icon-btn header__back" id="back" data-icon="back" aria-label="뒤로"></button>
+        <h1 class="header__title">이체</h1>
+        <a class="icon-btn" id="header-menu" href="#/menu" data-icon="menu" aria-label="전체메뉴"></a>
+        <a class="header__right" id="header-cancel" href="#/home" hidden>취소</a>
+      </header>
 
-        <div>
-          <section class="section">
-            <h2 class="section__title">나만의 맞춤메뉴</h2>
-            <div class="menu-grid">
-              <a href="history.html"><span class="menu-grid__icon">📒</span>거래내역조회</a>
-              <a href="result.html"><span class="menu-grid__icon">🧾</span>이체결과조회</a>
-              <a href="transfer.html"><span class="menu-grid__icon">💸</span>이체</a>
-              <a href="menu.html"><span class="menu-grid__icon">➕</span>추가</a>
+      <main class="page">
+        <!-- 1단계: 누구에게 -->
+        <form class="step is-active" id="step-to" novalidate>
+          <h2 class="title-lg">누구에게 보낼까요?</h2>
+
+          <label class="field__label" for="number">입금계좌</label>
+          <div class="input-box">
+            <input id="number" inputmode="numeric" autocomplete="off" placeholder="계좌번호 입력">
+            <button type="button" class="icon-btn" data-icon="camera" data-soon="계좌번호 촬영은 준비 중이에요." aria-label="계좌번호 촬영"></button>
+          </div>
+          <p class="field__hint" id="number-hint"></p>
+          <div class="inline-links">
+            <button type="button" data-soon="연락처 이체는 준비 중이에요."><span data-icon="contact"></span>연락처 이체</button>
+            <button type="button" id="search-account"><span data-icon="search"></span>계좌 검색</button>
+          </div>
+
+          <div class="segment" role="tablist">
+            <button type="button" class="is-active" role="tab" aria-selected="true" data-panel="panel-number">계좌번호</button>
+            <button type="button" role="tab" aria-selected="false" data-panel="panel-fav">즐겨찾기</button>
+          </div>
+
+          <div id="panel-number">
+            <details class="fold">
+              <summary>내 계좌 <span data-icon="down"></span></summary>
+              <ul class="people" id="my-accounts"></ul>
+            </details>
+            <details class="fold" open>
+              <summary><span>최근 이체 <span class="fold__count" id="recent-count"></span></span> <span data-icon="down"></span></summary>
+              <ul class="people" id="recent"><li class="skeleton skeleton--row"></li></ul>
+            </details>
+          </div>
+          <div id="panel-fav" hidden>
+            <ul class="people" id="favorites" style="margin-top:12px"></ul>
+          </div>
+
+          <div class="bottom-cta" id="to-cta" hidden><button class="btn btn--primary btn--block">확인</button></div>
+        </form>
+
+        <!-- 2단계: 얼마를 -->
+        <form class="step" id="step-amount" novalidate>
+          <div class="acct-line">
+            <p class="acct-line__label">내 계좌에서</p>
+            <button type="button" class="acct-line__value" id="pick-from"></button>
+            <p class="acct-line__sub" id="from-balance"></p>
+          </div>
+          <div class="acct-line">
+            <p class="acct-line__label" id="to-title"></p>
+            <p class="acct-line__value"><span id="to-line"></span> <button type="button" class="link" data-goto="step-to">변경</button></p>
+          </div>
+
+          <div class="amount-field">
+            <button type="button" class="input-line is-empty" id="amount" aria-label="보낼 금액 입력">얼마를 보낼까요?</button>
+            <p class="field__hint" id="amount-hint"></p>
+          </div>
+
+          <div class="amount-tail">
+            <button type="button" class="link-sub" id="guide">이용안내</button>
+          </div>
+          <label class="check" style="margin-top:28px"><input type="checkbox" id="reserve"> 예약이체</label>
+
+          <div class="bottom-cta"><button class="btn btn--primary btn--block" disabled>다음</button></div>
+        </form>
+
+        <!-- 3단계: 확인 -->
+        <form class="step" id="step-confirm" novalidate>
+          <div class="confirm__head">
+            <div class="confirm__badges" id="cf-badges"></div>
+            <p class="confirm__name" id="cf-name"></p>
+            <p class="confirm__account" id="cf-account"></p>
+            <p class="confirm__amount" id="cf-amount"></p>
+            <p class="muted" id="cf-amount-sub"></p>
+          </div>
+
+          <div class="rows">
+            <div class="row">
+              <span class="row__label">출금계좌</span>
+              <span class="row__value" id="cf-from"></span>
             </div>
-          </section>
+            <button type="button" class="row" data-edit="myMemo">
+              <span class="row__label">내 통장 표기</span>
+              <span class="row__value"><span data-val="myMemo"></span><span data-icon="right"></span></span>
+            </button>
+            <button type="button" class="row" data-edit="theirMemo">
+              <span class="row__label">받는 분 통장 표기</span>
+              <span class="row__value"><span data-val="theirMemo"></span><span data-icon="right"></span></span>
+            </button>
+          </div>
 
-          <a class="promo" href="#" data-soon>
-            <span><small>연습뱅크 × 연습증권</small><strong>계좌 개설하고 주식 받기</strong></span>
-            <span aria-hidden="true" style="font-size:32px">🎁</span>
-          </a>
+          <button type="button" class="more-toggle" aria-expanded="false" aria-controls="extra">추가정보입력 <span data-icon="down"></span></button>
+          <div id="extra" hidden>
+            <label class="field__label" for="memo">메모 (나만 보여요)</label>
+            <div class="input-box"><input id="memo" maxlength="25" placeholder="최대 25자까지 입력"></div>
+          </div>
+
+          <div class="bottom-cta">
+            <p class="bottom-note">연습뱅크는 <b>평생 수수료 무료!</b></p>
+            <button class="btn btn--primary btn--block">보내기</button>
+          </div>
+        </form>
+
+        <!-- 4단계: 완료 -->
+        <section class="step" id="step-done">
+          <div class="done">
+            <div class="done__icon" id="done-icon"></div>
+            <p class="done__name" id="done-name"></p>
+            <p class="done__amount" id="done-amount"></p>
+            <p class="done__desc" id="done-desc"></p>
+            <div id="done-tooltip" hidden>
+              <span class="tooltip">즐겨찾기에 추가해보세요 <button type="button" aria-label="안내 닫기" data-icon="close"></button></span>
+            </div>
+            <div class="rows" id="done-rows"></div>
+            <button type="button" class="more-toggle" id="done-more" aria-expanded="false" aria-controls="done-detail">자세히보기 <span data-icon="down"></span></button>
+            <div class="rows" id="done-detail" hidden style="margin-top:10px"></div>
+            <p class="done__links"><a class="link-sub" id="done-history" href="#/history">거래내역조회</a></p>
+          </div>
+          <div class="bottom-cta bottom-cta--2">
+            <button type="button" class="btn btn--line" id="done-share">공유</button>
+            <a class="btn btn--primary" href="#/home">확인</a>
+          </div>
+        </section>
+      </main>
+    </div>
+  </template>
+  <!-- ===== history ===== -->
+  <template id="tpl-history">
+    <div class="app">
+      <header class="header" style="background:var(--surface)">
+        <a class="icon-btn header__back" href="#/home" data-icon="back" aria-label="홈으로"></a>
+        <h1 class="header__title">거래내역조회</h1>
+        <a class="icon-btn" href="#/menu" data-icon="menu" aria-label="전체메뉴"></a>
+      </header>
+
+      <section class="history-head">
+        <label class="field__label" for="account" style="margin-top:4px">내 계좌</label>
+        <select class="select" id="account"></select>
+        <p class="account__balance" id="balance" style="margin:16px 0 0"></p>
+        <div class="account__actions">
+          <button class="btn btn--line" id="fill">채우기</button>
+          <a class="btn btn--primary" id="go-transfer" href="#/transfer">이체</a>
+        </div>
+        <nav class="sub-links" aria-label="다른 내역">
+          <a href="#/result">간편이체내역</a>
+          <button data-soon="예약된 이체가 없어요.">예약이체내역</button>
+          <button data-soon="ATM 출금 내역이 없어요.">ATM출금내역</button>
+        </nav>
+      </section>
+
+      <div class="filter-bar">
+        <button id="open-filter" aria-haspopup="dialog"><span id="filter-label"></span><span data-icon="down"></span></button>
+        <span id="count" class="muted"></span>
+      </div>
+      <p class="period" id="period"></p>
+      <ul class="tx-list" id="list" aria-live="polite"></ul>
+    </div>
+  </template>
+  <!-- ===== result ===== -->
+  <template id="tpl-result">
+    <div class="app app--plain">
+      <header class="header">
+        <button class="icon-btn header__back" id="back" data-icon="back" aria-label="뒤로"></button>
+        <h1 class="header__title">이체결과조회</h1>
+        <a class="icon-btn" href="#/menu" data-icon="menu" aria-label="전체메뉴"></a>
+      </header>
+
+      <!-- 목록 화면 -->
+      <div id="view-list">
+        <div class="page" style="padding-top:12px;padding-bottom:16px">
+          <label class="sr-only" for="account">계좌 선택</label>
+          <select class="select" id="account"><option value="">🏛 전체계좌</option></select>
+        </div>
+        <div class="filter-bar" style="margin-top:0;border-top:8px solid var(--bg)">
+          <button id="open-filter" aria-haspopup="dialog"><span id="filter-label"></span><span data-icon="down"></span></button>
+          <button class="icon-btn" id="toggle-search" data-icon="search" aria-label="받는 분 검색" aria-expanded="false"></button>
+        </div>
+        <div class="search-bar" id="search-bar" hidden>
+          <div class="input-box" style="height:46px"><input id="search" placeholder="받는 분 이름 검색" aria-label="받는 분 이름 검색"></div>
+        </div>
+        <p class="period" id="period"></p>
+        <ul class="tx-list" id="list" aria-live="polite"></ul>
+      </div>
+
+      <!-- 이체확인증 화면 -->
+      <div id="view-receipt" hidden>
+        <article class="page receipt" id="receipt" style="padding-bottom:120px"></article>
+        <div class="bottom-cta"><button class="btn btn--primary btn--block" id="share-receipt">공유하기</button></div>
+      </div>
+    </div>
+  </template>
+  <!-- ===== menu ===== -->
+  <template id="tpl-menu">
+    <div class="app app--plain">
+      <div class="menu-top">
+        <header class="header">
+          <button class="header__left" data-soon="연습 앱이라 로그아웃이 없어요.">로그아웃</button>
+          <a class="icon-btn" href="#/home" data-icon="home" aria-label="홈"></a>
+          <button class="icon-btn" id="theme" aria-label="테마 전환"></button>
+          <button class="icon-btn" id="close" data-icon="close" aria-label="전체메뉴 닫기"></button>
+        </header>
+        <h1 class="menu-user"><span id="user"></span><span data-icon="right"></span></h1>
+        <div class="menu-shortcuts">
+          <button data-soon>🎁 이벤트</button>
+          <button data-soon>🔒 인증/보안</button>
+          <button data-soon>🎧 고객센터</button>
+          <button data-soon>🌸 플러스</button>
+        </div>
+        <div class="input-box menu-search">
+          <span data-icon="search" style="color:var(--text-sub)"></span>
+          <input id="search" type="search" placeholder="검색어를 입력해 주세요." aria-label="메뉴 검색">
         </div>
       </div>
-    </main>
-  </div>
+
+      <nav class="menu-tabs" id="tabs" aria-label="메뉴 분류"></nav>
+      <main id="sections"></main>
+    </div>
+  </template>
 </body>
 </html>

@@ -13,22 +13,30 @@
  └─ 맞춤메뉴 ─▶ 거래내역조회 ─▶ 상세거래내역(메모 등록, 다시이체)
 ```
 
-| 파일 | 화면 | 연습 포인트 |
+**한 페이지 앱(SPA)** 이라서 HTML 파일은 `index.html` 하나뿐입니다.
+화면 5개는 `index.html` 안의 `<template>` 에 들어 있고, `js/app.js`(라우터)가 주소의 `#/이름`을 보고 화면을 바꿔 그립니다.
+
+| 주소 | 화면 (`<template>` / JS) | 연습 포인트 |
 |---|---|---|
-| `index.html` | 홈: 계좌 카드(스와이프), 이체/ATM출금, 맞춤메뉴 | 반응형 레이아웃, 이벤트 위임 |
-| `transfer.html` | 이체 4단계 + 은행 선택·키패드·통장 표기 시트 | 상태(state) 관리, 단계 전환, Promise 로 시트 결과 받기 |
-| `history.html` | 거래내역조회, 상세거래내역, 채우기 | 필터, 바텀시트, 메모 저장(POST) |
-| `result.html` | 이체결과조회 → 이체확인증 | 해시(#) 라우팅, 검색, 공유하기(Web Share API) |
-| `menu.html` | 전체메뉴 | 데이터로 화면 그리기, 검색 강조, IntersectionObserver |
+| `#/home` | 홈: 계좌 카드(스와이프), 이체/ATM출금, 맞춤메뉴 (`tpl-home` / `home.js`) | 반응형 레이아웃, 이벤트 위임 |
+| `#/transfer` | 이체 4단계 + 은행 선택·키패드·통장 표기 시트 (`tpl-transfer` / `transfer.js`) | 상태(state) 관리, 단계 전환, Promise 로 시트 결과 받기 |
+| `#/history` | 거래내역조회, 상세거래내역, 채우기 (`tpl-history` / `history.js`) | 필터, 바텀시트, 메모 저장 |
+| `#/result` | 이체결과조회 → `#/result?id=5` 이체확인증 (`tpl-result` / `result.js`) | 주소로 화면 나누기, 검색, 공유하기(Web Share API) |
+| `#/menu` | 전체메뉴 (`tpl-menu` / `menu.js`) | 데이터로 화면 그리기, 검색 강조, IntersectionObserver |
+
+화면 JS 는 모두 `mountXxx(params)` 함수 하나를 내보내고, 화면에 들어올 때마다 새로 실행됩니다.
+`params` 는 주소의 `?` 뒤 값이에요. (예: `#/transfer?from=1` → `params.get("from")` 은 `"1"`)
 
 공통 코드:
+- `js/app.js`: 라우터. 주소가 바뀌면 이전 화면 정리 → 템플릿 복사 → `mount` 실행
 - `js/api.js`: 서버 요청은 전부 여기. Supabase 설정이 없으면 같은 규칙으로 localStorage 사용
 - `js/ui.js`: 금액·날짜 포맷, 아이콘, 바텀시트(`openSheet`), 토스트, 공유, 다크 모드
 - `css/style.css`: 색은 모두 `:root` 변수 → 다크 모드는 변수만 바꿈
 
 ## 실행
 
-`fetch`와 ES Modules 때문에 **파일을 더블클릭해서 열면 동작하지 않습니다.** 로컬 서버로 여세요.
+원본은 JS 파일이 나뉘어 있어서(ES Modules) **더블클릭으로는 동작하지 않습니다.** 로컬 서버로 여세요.
+(CSS·JS 를 전부 합친 HTML 한 파일 버전은 더블클릭으로도 열려요.)
 
 ```bash
 python3 -m http.server 8000

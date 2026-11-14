@@ -60,7 +60,6 @@ export const fmtFull = (v) => `${fmtDate(v)} ${fmtTime(v)}:${pad(d(v).getSeconds
 export const esc = (s) =>
   String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 
-export const query = (key) => new URLSearchParams(location.search).get(key);
 
 // ---------- 아이콘 ----------
 const svg = (body) =>
@@ -118,14 +117,16 @@ export function setupThemeToggle(btn) {
 
 // ---------- 하단 탭바 ----------
 const TABS = [
-  { key: "home", label: "자산", icon: "wallet", href: "index.html" },
+  { key: "home", label: "자산", icon: "wallet", href: "#/home" },
   { key: "product", label: "상품", icon: "box" },
-  { key: "transfer", label: "송금", icon: "send", href: "transfer.html", center: true },
+  { key: "transfer", label: "송금", icon: "send", href: "#/transfer", center: true },
   { key: "benefit", label: "혜택", icon: "gift" },
   { key: "stock", label: "주식", icon: "chart" },
 ];
 
 export function renderTabbar(active) {
+  $(".tabbar")?.remove(); // 화면이 바뀔 때마다 다시 그림
+  if (!active) return;
   const nav = document.createElement("nav");
   nav.className = "tabbar";
   nav.setAttribute("aria-label", "주요 메뉴");
@@ -138,7 +139,10 @@ export function renderTabbar(active) {
   document.body.append(nav);
 }
 
-/** data-soon 이 붙은 링크/버튼은 "준비 중" 토스트 (페이지마다 한 번 호출) */
+/** 뒤로가기: 앱 안에서 이동한 기록이 없으면 홈으로 */
+export const goBack = () => (history.length > 1 ? history.back() : (location.hash = "#/home"));
+
+/** data-soon 이 붙은 링크/버튼은 "준비 중" 토스트 (앱 시작 때 한 번 호출) */
 export function handleSoon() {
   document.addEventListener("click", (e) => {
     const el = e.target.closest("[data-soon]");
@@ -241,7 +245,7 @@ export async function shareText(title, text) {
 }
 
 // ---------- 최근 이용 메뉴 (전체메뉴 화면에서 사용) ----------
-const RECENT_KEY = "recent-menus";
+const RECENT_KEY = "recent-menus-v2";
 export function trackVisit(label, href) {
   try {
     const list = JSON.parse(localStorage.getItem(RECENT_KEY) || "[]").filter((m) => m.href !== href);
