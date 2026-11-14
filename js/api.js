@@ -57,6 +57,9 @@ export const getTransactions = (accountId, opts) => db.getTransactions(accountId
 export const findRecipient = (bank, number) => db.findRecipient(bank, number);
 export const transfer = (payload) => db.transfer(payload);
 export const deposit = (accountId, amount) => db.deposit(accountId, amount);
+export const getFavorites = () => db.getFavorites();
+export const addFavorite = (r) => db.addFavorite(r);
+export const removeFavorite = (bank, number) => db.removeFavorite(bank, number);
 
 /** 최근 보낸 계좌: 출금 거래에서 중복을 뺀 최대 5개 */
 export async function getRecentRecipients(accountId) {
@@ -80,6 +83,7 @@ function createSupabaseDb() {
     "Content-Type": "application/json",
   };
   const get = (path) => request(`${base}/${path}`, { headers });
+  const match = (bank, number) => new URLSearchParams({ bank: `eq.${bank}`, number: `eq.${number}` });
   const rpc = (fn, body) =>
     request(`${base}/rpc/${fn}`, { method: "POST", headers, body: JSON.stringify(body) });
 
@@ -115,6 +119,16 @@ function createSupabaseDb() {
       }),
 
     deposit: (accountId, amount) => rpc("deposit", { p_account_id: accountId, p_amount: amount }),
+
+    getFavorites: () => get("favorites?select=*&order=created_at"),
+    addFavorite: ({ bank, number, name }) =>
+      request(`${base}/favorites`, {
+        method: "POST",
+        headers: { ...headers, Prefer: "return=representation,resolution=ignore-duplicates" },
+        body: JSON.stringify({ bank, number, name }),
+      }),
+    removeFavorite: (bank, number) =>
+      request(`${base}/favorites?${match(bank, number)}`, { method: "DELETE", headers }),
   };
 }
 
@@ -123,7 +137,11 @@ function createLocalDb() {
   const KEY = "practice-bank-db";
   const wait = (ms = 450) => new Promise((r) => setTimeout(r, ms)); // 네트워크 지연 흉내
 
-  const load = () => JSON.parse(localStorage.getItem(KEY) || "null") ?? seed();
+  const load = () => {
+    const data = JSON.parse(localStorage.getItem(KEY) || "null") ?? seed();
+    data.favorites ??= []; // 예전 버전 데이터에는 favorites 가 없음
+    return data;
+  };
   const save = (data) => localStorage.setItem(KEY, JSON.stringify(data));
 
   function seed() {
@@ -197,6 +215,27 @@ function createLocalDb() {
       const row = addTx(data, tx(accountId, "withdraw", myMemo || name, amount, acc.balance, null, bank, number));
       save(data);
       return row;
+    },
+
+    async getFavorites() {
+      await wait(200);
+      return load().favorites;
+    },
+
+    async addFavorite({ bank, number, name }) {
+      await wait(200);
+      const data = load();
+      if (!data.favorites.some((f) => f.bank === bank && f.number === number)) {
+        data.favorites.push({ bank, number, name, created_at: new Date().toISOString() });
+        save(data);
+      }
+    },
+
+    async removeFavorite(bank, number) {
+      await wait(200);
+      const data = load();
+      data.favorites = data.favorites.filter((f) => !(f.bank === bank && f.number === number));
+      save(data);
     },
 
     async deposit(accountId, amount) {

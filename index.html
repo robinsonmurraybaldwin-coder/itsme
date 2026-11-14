@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>연습뱅크</title>
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem("theme")||""}catch(e){}</script>
   <link rel="stylesheet" href="css/style.css">
   <script type="module" src="js/home.js"></script>
 </head>
@@ -12,7 +13,7 @@
     <header class="header">
       <h1 class="header__logo">연습뱅크</h1>
       <button class="icon-btn" data-icon="bell" aria-label="알림"></button>
-      <button class="icon-btn" data-icon="headset" aria-label="고객센터"></button>
+      <button class="icon-btn" id="theme" aria-label="테마 전환"></button>
       <button class="icon-btn" data-icon="menu" aria-label="전체 메뉴"></button>
     </header>
 

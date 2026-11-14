@@ -5,7 +5,7 @@
 -- =========================================================
 
 drop function if exists transfer, deposit;
-drop table if exists transactions, recipients, accounts;
+drop table if exists favorites, transactions, recipients, accounts;
 
 create table accounts (
   id       bigint generated always as identity primary key,
@@ -34,6 +34,16 @@ create table transactions (
   created_at      timestamptz not null default now()
 );
 create index on transactions (account_id, created_at desc);
+
+-- 즐겨찾기한 받는 계좌
+create table favorites (
+  bank        text not null,
+  number      text not null,
+  name        text not null,
+  created_at  timestamptz not null default now(),
+  primary key (bank, number),
+  foreign key (bank, number) references recipients (bank, number) on delete cascade
+);
 
 -- ---------------------------------------------------------
 -- 이체: 잔액 확인 → 차감 → 거래 기록을 한 번에(트랜잭션) 처리
@@ -104,10 +114,15 @@ end $$;
 alter table accounts     enable row level security;
 alter table recipients   enable row level security;
 alter table transactions enable row level security;
+alter table favorites    enable row level security;
 
 create policy "read accounts"     on accounts     for select using (true);
 create policy "read recipients"   on recipients   for select using (true);
 create policy "read transactions" on transactions for select using (true);
+-- 즐겨찾기는 프론트에서 직접 추가/삭제 (연습용이라 누구나 가능)
+create policy "read favorites"   on favorites for select using (true);
+create policy "add favorites"    on favorites for insert with check (true);
+create policy "remove favorites" on favorites for delete using (true);
 
 revoke all on function transfer, deposit from public;
 grant execute on function transfer, deposit to anon, authenticated;

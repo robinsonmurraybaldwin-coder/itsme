@@ -1,7 +1,8 @@
 import { getAccounts, getExchangeRates } from "./api.js";
-import { $, $$, icons, won, esc, renderTabbar, toast, errorBox } from "./ui.js";
+import { $, $$, icons, won, esc, renderTabbar, toast, errorBox, setupThemeToggle } from "./ui.js";
 
 renderTabbar("home");
+setupThemeToggle($("#theme"));
 $$("[data-icon]").forEach((el) => (el.innerHTML = icons[el.dataset.icon]));
 $$("[data-soon]").forEach((el) =>
   el.addEventListener("click", (e) => {

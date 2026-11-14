@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>이체 - 연습뱅크</title>
+  <script>try{document.documentElement.dataset.theme=localStorage.getItem("theme")||""}catch(e){}</script>
   <link rel="stylesheet" href="css/style.css">
   <script type="module" src="js/transfer.js"></script>
 </head>
@@ -33,6 +34,11 @@
           <input class="input-line" id="number" inputmode="numeric" autocomplete="off" placeholder="숫자만 입력">
           <p class="field__hint" id="number-hint"></p>
         </div>
+
+        <section class="recent" aria-labelledby="fav-title" id="fav-section" hidden>
+          <h2 class="section__title" id="fav-title">즐겨찾기</h2>
+          <ul id="favorites"></ul>
+        </section>
 
         <section class="recent" aria-labelledby="recent-title">
           <h2 class="section__title" id="recent-title">최근 보낸 계좌</h2>
@@ -64,6 +70,13 @@
             <button type="button" class="chip" data-add="100000">+10만</button>
             <button type="button" class="chip" data-add="1000000">+100만</button>
             <button type="button" class="chip" data-add="all">전액</button>
+          </div>
+          <div class="keypad" id="keypad" aria-label="숫자 키패드">
+            <button type="button">1</button><button type="button">2</button><button type="button">3</button>
+            <button type="button">4</button><button type="button">5</button><button type="button">6</button>
+            <button type="button">7</button><button type="button">8</button><button type="button">9</button>
+            <button type="button">00</button><button type="button">0</button>
+            <button type="button" data-key="back" aria-label="지우기"></button>
           </div>
         </div>
 

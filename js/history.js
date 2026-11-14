@@ -1,5 +1,5 @@
 import { getAccounts, getTransactions, deposit } from "./api.js";
-import { $, $$, icons, won, toKoreanUnit, parseNumber, fmtDate, fmtDateTime, esc, renderTabbar, toast, setLoading, errorBox } from "./ui.js";
+import { $, $$, icons, won, toKoreanUnit, parseNumber, fmtDate, fmtDateTime, fmtDay, esc, renderTabbar, toast, setLoading, errorBox } from "./ui.js";
 
 renderTabbar("home");
 $$("[data-icon]").forEach((el) => (el.innerHTML = icons[el.dataset.icon]));
@@ -23,11 +23,24 @@ function txItem(tx) {
   const isDeposit = tx.type === "deposit";
   return `
     <li class="tx">
-      <span class="tx__date">${fmtDateTime(tx.created_at)}</span>
+      <span class="tx__date">${fmtDateTime(tx.created_at).slice(6)}</span>
       <span class="tx__name">${esc(tx.counterparty)}</span>
       <span class="tx__amount ${isDeposit ? "plus" : "minus"}">${isDeposit ? "" : "-"}${won(tx.amount)}</span>
       <span class="tx__balance">${won(tx.balance_after)}</span>
     </li>`;
+}
+
+/** 같은 날짜끼리 묶어서 날짜 제목 + 거래들을 그림 */
+function renderGrouped(list) {
+  let lastDay = "";
+  return list
+    .map((tx) => {
+      const day = fmtDay(tx.created_at);
+      const head = day !== lastDay ? `<li class="tx-day">${day}</li>` : "";
+      lastDay = day;
+      return head + txItem(tx);
+    })
+    .join("");
 }
 
 async function loadList() {
@@ -45,7 +58,7 @@ async function loadList() {
   try {
     const list = await getTransactions(acc.id, { ...filter, days: Number(filter.days) });
     $("#count").textContent = `총 ${list.length}건`;
-    listEl.innerHTML = list.length ? list.map(txItem).join("") : '<li class="empty">조회된 거래내역이 없어요.</li>';
+    listEl.innerHTML = list.length ? renderGrouped(list) : '<li class="empty">조회된 거래내역이 없어요.</li>';
   } catch (err) {
     listEl.replaceChildren(errorBox(`내역을 불러오지 못했어요. ${err.message}`, loadList));
   }

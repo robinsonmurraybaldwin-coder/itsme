@@ -19,6 +19,44 @@
   --shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
   --header-h: 56px;
   --tabbar-h: 64px;
+  --inverse-bg: #191f28;   /* 선택된 칩/탭 배경 */
+  --inverse-text: #ffffff;
+  --overlay: rgba(255, 255, 255, 0.85);
+  --skeleton-a: #eceef0;
+  --skeleton-b: #f6f7f8;
+  --banner-a: #e6f7f1;
+  --banner-b: #d3f9d8;
+  color-scheme: light;
+}
+
+/* ---------- 다크 모드 ----------
+   1) OS 설정이 다크이고 사용자가 '라이트'를 고르지 않았을 때
+   2) 사용자가 직접 '다크'를 골랐을 때 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --primary-soft: #12352b; --primary-dark: #3ddc97;
+    --bg: #101317; --surface: #1b1f24;
+    --text: #eef1f4; --text-sub: #9aa4af; --text-weak: #5b6570; --line: #2b3138;
+    --plus: #5b9dff; --minus: #ff6b78;
+    --shadow: none;
+    --inverse-bg: #eef1f4; --inverse-text: #101317;
+    --overlay: rgba(16, 19, 23, 0.85);
+    --skeleton-a: #22272d; --skeleton-b: #2c323a;
+    --banner-a: #12352b; --banner-b: #1a3d2c;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --primary-soft: #12352b; --primary-dark: #3ddc97;
+  --bg: #101317; --surface: #1b1f24;
+  --text: #eef1f4; --text-sub: #9aa4af; --text-weak: #5b6570; --line: #2b3138;
+  --plus: #5b9dff; --minus: #ff6b78;
+  --shadow: none;
+  --inverse-bg: #eef1f4; --inverse-text: #101317;
+  --overlay: rgba(16, 19, 23, 0.85);
+  --skeleton-a: #22272d; --skeleton-b: #2c323a;
+  --banner-a: #12352b; --banner-b: #1a3d2c;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -133,7 +171,7 @@ svg { display: block; }
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
   padding: 18px 20px; margin-bottom: 16px;
   border-radius: var(--radius);
-  background: linear-gradient(135deg, #e6f7f1, #d3f9d8);
+  background: linear-gradient(135deg, var(--banner-a), var(--banner-b));
 }
 .banner__text strong { display: block; font-size: 16px; }
 .banner__text span { font-size: 13px; color: var(--text-sub); }
@@ -145,7 +183,7 @@ svg { display: block; }
   padding: 8px 14px; border-radius: 999px;
   font-size: 14px; color: var(--text-sub); background: var(--line);
 }
-.seg__btn.is-active { background: var(--text); color: #fff; font-weight: 600; }
+.seg__btn.is-active { background: var(--inverse-bg); color: var(--inverse-text); font-weight: 600; }
 
 /* ---------- 계좌 카드 (가로 스와이프) ---------- */
 .carousel {
@@ -159,6 +197,7 @@ svg { display: block; }
 .dots { display: flex; justify-content: center; gap: 6px; margin-top: 10px; }
 .dots span { width: 6px; height: 6px; border-radius: 3px; background: var(--text-weak); transition: width 0.2s; }
 .dots span.is-active { width: 16px; background: var(--text); }
+.sheet { background: var(--surface); color: var(--text); }
 
 .account__name { font-size: 15px; font-weight: 600; }
 .account__number {
@@ -243,7 +282,7 @@ svg { display: block; }
   padding: 8px 12px; border-radius: 999px;
   font-size: 13px; background: var(--bg); color: var(--text-sub);
 }
-.chip.is-active { background: var(--text); color: #fff; }
+.chip.is-active { background: var(--inverse-bg); color: var(--inverse-text); }
 
 .check { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; margin-top: 24px; }
 .check input { width: 18px; height: 18px; accent-color: var(--primary); }
@@ -299,8 +338,8 @@ svg { display: block; }
 
 /* 최근 보낸 계좌 */
 .recent { margin-top: 32px; }
-.recent li button {
-  width: 100%; display: flex; align-items: center; gap: 12px;
+.recent [data-pick] {
+  flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px;
   padding: 12px 0; text-align: left;
 }
 .recent__name { font-weight: 600; font-size: 15px; }
@@ -310,7 +349,7 @@ svg { display: block; }
 .loading {
   position: fixed; inset: 0; z-index: 100;
   display: none; place-items: center;
-  background: rgba(255, 255, 255, 0.85);
+  background: var(--overlay);
 }
 .loading.is-show { display: grid; }
 .loading__dots { display: grid; grid-template-columns: repeat(2, 10px); gap: 6px; }
@@ -326,7 +365,7 @@ svg { display: block; }
 /* 스켈레톤 (데이터 불러오는 동안 회색 박스) */
 .skeleton {
   border-radius: 10px;
-  background: linear-gradient(90deg, #eceef0 25%, #f6f7f8 50%, #eceef0 75%);
+  background: linear-gradient(90deg, var(--skeleton-a) 25%, var(--skeleton-b) 50%, var(--skeleton-a) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.2s infinite;
 }
@@ -364,6 +403,29 @@ svg { display: block; }
   background: var(--surface); border-radius: 14px;
 }
 .error-box .btn { margin-top: 12px; height: 38px; font-size: 14px; }
+
+/* 날짜별 묶음 제목 */
+.tx-day {
+  position: sticky; top: var(--header-h); z-index: 1;
+  padding: 10px 16px; font-size: 13px; font-weight: 700; color: var(--text-sub);
+  background: var(--bg);
+}
+
+/* ---------- 숫자 키패드 (휴대폰에서만) ---------- */
+.keypad { display: grid; grid-template-columns: repeat(3, 1fr); margin-top: 16px; }
+.keypad button {
+  height: 56px; border-radius: 12px; font-size: 22px; font-weight: 600;
+}
+.keypad button:active { background: var(--bg); }
+.keypad svg { width: 26px; height: 26px; margin: auto; }
+
+/* ---------- 즐겨찾기 별 ---------- */
+.recent li { display: flex; align-items: center; }
+.star { width: 40px; height: 40px; flex-shrink: 0; display: grid; place-items: center; color: var(--text-weak); }
+.star svg { width: 20px; height: 20px; }
+.star.is-on { color: #fcc419; }
+.star.is-on svg { fill: currentColor; }
+.recent + .recent { margin-top: 20px; }
 
 /* ---------- 바텀시트 (<dialog>) ---------- */
 .sheet {
@@ -411,6 +473,7 @@ svg { display: block; }
     max-width: 720px; margin-left: auto; margin-right: auto;
   }
   .step { max-width: 480px; margin: 0 auto; }
+  .keypad { display: none; }   /* 큰 화면은 키보드로 입력 */
   .bottom-cta { max-width: 480px; margin: 0 auto; }
 }
 

@@ -44,6 +44,12 @@ export function toKoreanUnit(n) {
 export const parseNumber = (str) => Number(String(str).replace(/[^\d]/g, "")) || 0;
 
 const pad = (n) => String(n).padStart(2, "0");
+
+/** "2026-11-14T..." → "11월 14일 (토)" : 날짜별 묶음 제목 */
+export const fmtDay = (iso) => {
+  const d = new Date(iso);
+  return `${d.getMonth() + 1}월 ${d.getDate()}일 (${"일월화수목금토"[d.getDay()]})`;
+};
 export const fmtDate = (d) => `${d.getFullYear()}.${pad(d.getMonth() + 1)}.${pad(d.getDate())}`;
 export const fmtDateTime = (iso) => {
   const d = new Date(iso);
@@ -73,7 +79,31 @@ export const icons = {
   send: svg('<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>'),
   gift: svg('<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 0 1 0 5"/>'),
   chart: svg('<path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/>'),
+  star: svg('<path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1Z"/>'),
+  moon: svg('<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>'),
+  sun: svg('<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>'),
+  backspace: svg('<path d="M21 4H8l-7 8 7 8h13a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Z"/><path d="m18 9-6 6M12 9l6 6"/>'),
 };
+
+// ---------- 다크 모드 ----------
+// 저장값이 없으면 OS 설정을 따르고, 버튼을 누르면 반대 테마를 저장합니다.
+// (깜빡임 방지용으로 각 HTML <head> 에서도 저장값을 먼저 적용합니다)
+const isDark = () =>
+  (document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark";
+
+export function setupThemeToggle(btn) {
+  const paint = () => {
+    btn.innerHTML = isDark() ? icons.sun : icons.moon;
+    btn.setAttribute("aria-label", isDark() ? "라이트 모드로 전환" : "다크 모드로 전환");
+  };
+  btn.addEventListener("click", () => {
+    const next = isDark() ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    try { localStorage.setItem("theme", next); } catch {}
+    paint();
+  });
+  paint();
+}
 
 // ---------- 하단 탭바: 각 페이지에서 한 줄로 그려줌 ----------
 const TABS = [

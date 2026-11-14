@@ -1,4 +1,4 @@
-import { getAccounts, findRecipient, getRecentRecipients, transfer } from "./api.js";
+import { getAccounts, findRecipient, getRecentRecipients, transfer, getFavorites, addFavorite, removeFavorite } from "./api.js";
 import { $, $$, icons, BANKS, bankOf, bankBadge, won, toKoreanUnit, parseNumber, esc, setLoading, toast } from "./ui.js";
 
 // 화면 전체에서 공유하는 상태(state)
@@ -46,31 +46,71 @@ function updateFrom() {
   loadRecent();
 }
 
-async function loadRecent() {
-  const ul = $("#recent");
-  ul.innerHTML = '<li class="skeleton skeleton--row"></li>';
-  const list = await getRecentRecipients(state.from.id).catch(() => []);
-  ul.innerHTML = list.length
-    ? list
-        .map(
-          (r) => `
-        <li><button type="button" data-bank="${esc(r.bank)}" data-number="${esc(r.number)}">
-          ${bankBadge(r.bank)}
-          <span><span class="recent__name">${esc(r.name)}</span><br>
-          <span class="recent__acct">${bankOf(r.bank).name} ${esc(r.number)}</span></span>
-        </button></li>`
-        )
-        .join("")
+let favorites = [];
+const keyOf = (r) => `${r.bank}-${r.number}`;
+const isFav = (r) => favorites.some((f) => keyOf(f) === keyOf(r));
+
+/** 받는 계좌 한 줄: 누르면 선택, 별 누르면 즐겨찾기 토글 */
+function recipientItem(r) {
+  const on = isFav(r);
+  return `
+    <li>
+      <button type="button" data-pick data-bank="${esc(r.bank)}" data-number="${esc(r.number)}">
+        ${bankBadge(r.bank)}
+        <span><span class="recent__name">${esc(r.name)}</span><br>
+        <span class="recent__acct">${bankOf(r.bank).name} ${esc(r.number)}</span></span>
+      </button>
+      <button type="button" class="star ${on ? "is-on" : ""}" data-star
+        data-bank="${esc(r.bank)}" data-number="${esc(r.number)}" data-name="${esc(r.name)}"
+        aria-pressed="${on}" aria-label="${esc(r.name)} 즐겨찾기">${icons.star}</button>
+    </li>`;
+}
+
+let recent = [];
+
+function renderLists() {
+  $("#fav-section").hidden = !favorites.length;
+  $("#favorites").innerHTML = favorites.map(recipientItem).join("");
+  $("#recent").innerHTML = recent.length
+    ? recent.map(recipientItem).join("")
     : '<li class="recent__acct">아직 보낸 계좌가 없어요.</li>';
 }
 
-// 최근 계좌 누르면 입력칸 채우고 바로 조회
-$("#recent").addEventListener("click", (e) => {
-  const btn = e.target.closest("button[data-number]");
-  if (!btn) return;
-  bankSel.value = btn.dataset.bank;
-  numberInput.value = btn.dataset.number;
-  stepTo.requestSubmit();
+async function loadRecent() {
+  $("#recent").innerHTML = '<li class="skeleton skeleton--row"></li>';
+  // 두 요청은 서로 상관없으니 동시에 보냄
+  [recent, favorites] = await Promise.all([
+    getRecentRecipients(state.from.id).catch(() => []),
+    getFavorites().catch(() => []),
+  ]);
+  renderLists();
+}
+
+// 즐겨찾기 / 최근 목록 클릭 처리 (이벤트 위임)
+stepTo.addEventListener("click", async (e) => {
+  const pick = e.target.closest("[data-pick]");
+  if (pick) {
+    bankSel.value = pick.dataset.bank;
+    numberInput.value = pick.dataset.number;
+    return stepTo.requestSubmit();
+  }
+
+  const star = e.target.closest("[data-star]");
+  if (!star) return;
+  const { bank, number, name } = star.dataset;
+  const r = { bank, number, name };
+  const wasOn = isFav(r);
+  // 화면 먼저 바꾸고(낙관적 업데이트) 실패하면 되돌리기
+  favorites = wasOn ? favorites.filter((f) => keyOf(f) !== keyOf(r)) : [...favorites, r];
+  renderLists();
+  try {
+    await (wasOn ? removeFavorite(r.bank, r.number) : addFavorite(r));
+    toast(wasOn ? "즐겨찾기에서 뺐어요." : "즐겨찾기에 추가했어요.");
+  } catch (err) {
+    favorites = await getFavorites().catch(() => favorites);
+    renderLists();
+    toast(`즐겨찾기 저장 실패: ${err.message}`);
+  }
 });
 
 fromSel.addEventListener("change", updateFrom);
@@ -135,6 +175,22 @@ $(".chips", stepAmount).addEventListener("click", (e) => {
   const add = e.target.closest("[data-add]")?.dataset.add;
   if (!add) return;
   setAmount(add === "all" ? state.from.balance : state.amount + Number(add));
+});
+
+// 숫자 키패드: 휴대폰에서는 OS 키보드 대신 화면 키패드 사용
+const keypad = $("#keypad");
+const bigScreen = matchMedia("(min-width: 768px)");
+const syncInputMode = () => amountInput.setAttribute("inputmode", bigScreen.matches ? "numeric" : "none");
+bigScreen.addEventListener("change", syncInputMode);
+syncInputMode();
+
+$('[data-key="back"]', keypad).innerHTML = icons.backspace;
+keypad.addEventListener("click", (e) => {
+  const key = e.target.closest("button");
+  if (!key) return;
+  const digits = String(state.amount || "");
+  const next = key.dataset.key === "back" ? digits.slice(0, -1) : (digits + key.textContent).slice(0, 12);
+  setAmount(Number(next) || 0);
 });
 
 $("#reserve").addEventListener("change", (e) => {

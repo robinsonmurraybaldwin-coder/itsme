@@ -1,7 +1,8 @@
 import { getExchangeRates, getCoinTickers } from "./api.js";
-import { $, won, parseNumber, renderTabbar, errorBox } from "./ui.js";
+import { $, won, parseNumber, renderTabbar, errorBox, setupThemeToggle } from "./ui.js";
 
 renderTabbar("market");
+setupThemeToggle($("#theme"));
 
 const CURRENCIES = {
   USD: "🇺🇸 미국 달러",
