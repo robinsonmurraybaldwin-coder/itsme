@@ -136,8 +136,14 @@ export function renderTabbar(active) {
     return `<a class="${cls}" href="${t.href ?? "#"}" ${t.href ? "" : "data-soon"} ${t.key === active ? 'aria-current="page"' : ""}>
       ${icon}<span>${t.label}</span></a>`;
   }).join("");
-  document.body.append(nav);
+  layer().append(nav);
 }
+
+/** 탭바·시트·토스트를 붙일 곳: 휴대폰 화면(.screen) 안 */
+export const layer = () => $(".screen") ?? document.body;
+
+/** 화면 맨 위로 (스크롤은 .scroller 안에서 일어남) */
+export const scrollTop = () => ($(".scroller") ?? document.scrollingElement).scrollTo(0, 0);
 
 /** 뒤로가기: 앱 안에서 이동한 기록이 없으면 홈으로 */
 export const goBack = () => (history.length > 1 ? history.back() : (location.hash = "#/home"));
@@ -158,7 +164,7 @@ export function toast(message) {
   let el = $(".toast");
   if (!el) {
     el = Object.assign(document.createElement("div"), { className: "toast", role: "status" });
-    document.body.append(el);
+    layer().append(el);
   }
   el.textContent = message;
   el.classList.add("is-show");
@@ -171,7 +177,7 @@ export function setLoading(show) {
   if (!el) {
     el = Object.assign(document.createElement("div"), { className: "loading" });
     el.innerHTML = `<div class="loading__dots" aria-label="처리 중">${"<span></span>".repeat(4)}</div>`;
-    document.body.append(el);
+    layer().append(el);
   }
   el.classList.toggle("is-show", show);
 }
@@ -187,20 +193,31 @@ export function errorBox(message, onRetry) {
 // ---------- 바텀시트 ----------
 /**
  * 아래에서 올라오는 시트를 열고 <dialog> 를 돌려줍니다.
- * - 바깥(어두운 부분)이나 [data-close] 를 누르면 닫힘
+ * - 휴대폰 틀 안에 띄우려고 showModal() 대신 show() + 직접 만든 어두운 배경 사용
+ * - 배경이나 [data-close] 를 누르거나 Esc 키를 누르면 닫힘
  * - 닫히면 DOM 에서 자동으로 지워짐
  */
 export function openSheet(html, { title = "", className = "" } = {}) {
+  const backdrop = Object.assign(document.createElement("div"), { className: "sheet-backdrop" });
   const dlg = document.createElement("dialog");
   dlg.className = `sheet ${className}`;
+  dlg.tabIndex = -1;
+  dlg.setAttribute("aria-modal", "true");
   dlg.innerHTML = `${title ? `<div class="sheet__head"><h3>${title}</h3>
     <button class="icon-btn" data-close aria-label="닫기">${icons.close}</button></div>` : ""}${html}`;
-  document.body.append(dlg);
-  dlg.addEventListener("click", (e) => {
-    if (e.target === dlg || e.target.closest("[data-close]")) dlg.close();
+  layer().append(backdrop, dlg);
+
+  const onKey = (e) => e.key === "Escape" && dlg.close();
+  backdrop.addEventListener("click", () => dlg.close());
+  dlg.addEventListener("click", (e) => e.target.closest("[data-close]") && dlg.close());
+  document.addEventListener("keydown", onKey);
+  dlg.addEventListener("close", () => {
+    dlg.remove();
+    backdrop.remove();
+    document.removeEventListener("keydown", onKey);
   });
-  dlg.addEventListener("close", () => dlg.remove());
-  dlg.showModal();
+  dlg.show();
+  dlg.focus();
   return dlg;
 }
 

@@ -1,7 +1,7 @@
 import { getAccounts, findRecipient, getRecentRecipients, transfer, getFavorites, addFavorite, removeFavorite } from "./api.js";
 import {
   $, $$, icons, OWNER, BANKS, bankOf, bankBadge, won, toKoreanUnit, fmtDate, fmtFull, esc,
-  goBack, setLoading, toast, openSheet, promptSheet, copyText, shareText, trackVisit,
+  goBack, scrollTop, setLoading, toast, openSheet, promptSheet, copyText, shareText, trackVisit,
 } from "./ui.js";
 
 /** 화면을 그릴 때마다 app.js 가 호출 (params: 주소의 ?뒤 값) */
@@ -37,7 +37,7 @@ export function mountTransfer(params) {
     $("#header-menu").hidden = stepId !== "step-to";
     $("#header-cancel").hidden = !["step-amount", "step-confirm"].includes(stepId);
     $("#back").hidden = stepId === "step-done";
-    window.scrollTo(0, 0);
+    scrollTop();
   }
 
   $("#back").addEventListener("click", () => {

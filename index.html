@@ -14,7 +14,32 @@
     js/app.js 가 주소의 #/이름 을 보고 해당 화면을 #root 에 그립니다.
     예) #/home, #/transfer?from=1, #/result?id=5
   -->
-  <div id="root"></div>
+  <div class="device">
+    <!-- 휴대폰 상태바: 시간, 신호, 배터리 (진짜 휴대폰에서는 숨김) -->
+    <div class="statusbar" aria-hidden="true">
+      <span id="clock">--:--</span>
+      <span class="statusbar__right">
+        <span class="statusbar__lte">LTE</span>
+        <span class="signal"><i></i><i></i><i></i><i></i></span>
+        <span id="battery-text">100%</span>
+        <span class="battery"><i id="battery-level"></i></span>
+      </span>
+    </div>
+
+    <!-- 앱 화면: 시트·토스트·탭바도 이 안에 붙어서 휴대폰 틀 밖으로 안 나감 -->
+    <div class="screen">
+      <div class="scroller">
+        <div id="root"></div>
+      </div>
+    </div>
+
+    <!-- 안드로이드 버튼: 메뉴 / 홈 / 뒤로 -->
+    <nav class="navbar" aria-label="휴대폰 버튼">
+      <button id="nav-recent" aria-label="전체메뉴"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 6v12M12 6v12M17 6v12"/></svg></button>
+      <button id="nav-home" aria-label="홈"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="5"/></svg></button>
+      <button id="nav-back" aria-label="뒤로"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></button>
+    </nav>
+  </div>
 
   <!-- ===== home ===== -->
   <template id="tpl-home">

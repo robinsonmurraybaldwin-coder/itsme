@@ -4,7 +4,7 @@
 // 페이지를 새로 불러오지 않고 #root 안의 내용만 바꾸기 때문에
 // HTML 파일이 하나뿐이고, 화면 전환이 앱처럼 빠릅니다.
 // =========================================================
-import { $, $$, paintIcons, handleSoon, renderTabbar, setLoading } from "./ui.js";
+import { $, $$, paintIcons, handleSoon, renderTabbar, setLoading, scrollTop, goBack } from "./ui.js";
 import { mountHome } from "./home.js";
 import { mountTransfer } from "./transfer.js";
 import { mountHistory } from "./history.js";
@@ -38,8 +38,40 @@ function render() {
   paintIcons($("#root"));
   renderTabbar(route.tab);
   cleanup = route.mount(new URLSearchParams(qs)) ?? null;
-  window.scrollTo(0, 0);
+  scrollTop();
+
+  // 상태바 색을 화면 배경과 맞추기 (흰 화면 / 회색 화면)
+  const plain = $("#root .app--plain");
+  $(".statusbar").style.background = key === "menu" ? "var(--menu-top)" : plain ? "var(--surface)" : "";
 }
+
+// ---------- 상태바: 시계 ----------
+function tick() {
+  const now = new Date();
+  $("#clock").textContent = `${now.getHours()}:${String(now.getMinutes()).padStart(2, "0")}`;
+}
+tick();
+setInterval(tick, 10_000);
+
+// ---------- 상태바: 배터리 (Battery API, 지원하는 브라우저만) ----------
+function paintBattery(level) {
+  const pct = Math.round(level * 100);
+  $("#battery-text").textContent = `${pct}%`;
+  $("#battery-level").style.width = `${pct}%`;
+}
+if (navigator.getBattery) {
+  navigator.getBattery().then((b) => {
+    paintBattery(b.level);
+    b.addEventListener("levelchange", () => paintBattery(b.level));
+  }).catch(() => paintBattery(1));
+} else {
+  paintBattery(1); // 사파리·파이어폭스는 배터리 정보를 주지 않음
+}
+
+// ---------- 안드로이드 버튼 ----------
+$("#nav-recent").addEventListener("click", () => (location.hash = "#/menu"));
+$("#nav-home").addEventListener("click", () => (location.hash = "#/home"));
+$("#nav-back").addEventListener("click", goBack);
 
 handleSoon();
 window.addEventListener("hashchange", render);

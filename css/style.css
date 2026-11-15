@@ -81,7 +81,8 @@ svg { display: block; flex-shrink: 0; }
 }
 
 /* ---------- 레이아웃 ---------- */
-.app { min-height: 100dvh; padding-bottom: calc(var(--tabbar-h) + 16px); }
+.app { min-height: 100%; padding-bottom: calc(var(--tabbar-h) + 16px); animation: pageIn 0.25s ease; }
+@keyframes pageIn { from { opacity: 0; transform: translateX(24px); } }
 .app--plain { padding-bottom: 0; background: var(--surface); }
 .page { padding: 0 16px; }
 
@@ -378,7 +379,6 @@ svg { display: block; flex-shrink: 0; }
 .done__links { margin-top: 70px; }
 
 /* ---------- 키패드 시트 ---------- */
-.keypad-sheet::backdrop { background: rgba(0, 0, 0, 0.08); }
 .chips { display: flex; flex-wrap: wrap; gap: 6px; }
 .chips--even { display: grid; grid-template-columns: repeat(5, 1fr); }
 .chips--even .chip { padding: 0 4px; white-space: nowrap; }
@@ -394,12 +394,16 @@ svg { display: block; flex-shrink: 0; }
 
 /* ---------- 바텀시트 (<dialog>) ---------- */
 .sheet {
-  margin: auto auto 0; width: 100%; max-width: 480px; max-height: 85dvh;
+  position: fixed; left: 0; right: 0; bottom: 0; top: auto; z-index: 60;
+  width: 100%; max-height: 85%; overflow-y: auto; margin: 0;
   border: 0; border-radius: 22px 22px 0 0;
   padding: 24px 20px calc(20px + env(safe-area-inset-bottom));
   background: var(--surface); color: var(--text);
 }
-.sheet::backdrop { background: rgba(0, 0, 0, 0.45); }
+.sheet:focus { outline: none; }
+.sheet-backdrop { position: fixed; inset: 0; z-index: 59; background: rgba(0, 0, 0, 0.45); animation: fade 0.2s; }
+.sheet-backdrop:has(+ .keypad-sheet) { background: rgba(0, 0, 0, 0.08); }
+@keyframes fade { from { opacity: 0; } }
 .sheet[open] { animation: up 0.22s ease; }
 @keyframes up { from { transform: translateY(100%); } }
 .sheet__head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
@@ -533,44 +537,53 @@ svg { display: block; flex-shrink: 0; }
 .toast.is-show { transform: translate(-50%, 0); opacity: 1; }
 
 /* =========================================================
-   반응형
+   휴대폰 틀
+   .screen 에 transform 을 주면 그 안의 position: fixed 요소(탭바, 하단 버튼,
+   시트, 토스트)가 브라우저 창이 아니라 휴대폰 화면 기준으로 붙어요.
    ========================================================= */
+html, body { height: 100%; }
+body { overflow: hidden; }
+.device { height: 100dvh; display: flex; flex-direction: column; background: var(--surface); }
+.screen { position: relative; flex: 1; min-height: 0; overflow: hidden; transform: translateZ(0); }
+.scroller { height: 100%; overflow-y: auto; overscroll-behavior: contain; }
+#root { min-height: 100%; display: flex; flex-direction: column; }
+#root > .app { flex: 1; }
 
-/* 큰 폰 / 작은 태블릿 */
-@media (min-width: 600px) {
-  .carousel > * { flex-basis: calc(50% - 6px); }
+.statusbar {
+  flex: none; height: 30px; padding: 0 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 13px; font-weight: 600; background: var(--bg); transition: background 0.2s;
+}
+.statusbar__right { display: inline-flex; align-items: center; gap: 5px; }
+.statusbar__lte { font-size: 10px; font-weight: 800; }
+.signal { display: inline-flex; align-items: flex-end; gap: 1.5px; height: 11px; }
+.signal i { width: 3px; background: currentColor; border-radius: 1px; }
+.signal i:nth-child(1) { height: 3px; } .signal i:nth-child(2) { height: 5px; }
+.signal i:nth-child(3) { height: 8px; } .signal i:nth-child(4) { height: 11px; }
+.battery { position: relative; width: 22px; height: 11px; padding: 1.5px; border: 1.5px solid currentColor; border-radius: 3px; }
+.battery::after { content: ""; position: absolute; right: -4px; top: 2.5px; width: 2px; height: 4px; border-radius: 0 1px 1px 0; background: currentColor; }
+.battery i { display: block; height: 100%; border-radius: 1px; background: currentColor; }
+
+.navbar { flex: none; height: 44px; display: grid; grid-template-columns: repeat(3, 1fr); background: var(--surface); border-top: 1px solid var(--line); }
+.navbar button { display: grid; place-items: center; color: var(--text-sub); }
+.navbar button:active { background: var(--bg); }
+.navbar svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* 진짜 휴대폰(좁은 화면): 휴대폰 자체 상태바가 있으니 가짜 상태바·버튼 숨김 */
+@media (max-width: 499px) {
+  .statusbar, .navbar { display: none; }
 }
 
-/* 태블릿 이상: 가운데 정렬 */
-@media (min-width: 768px) {
-  .page, .history-head, .filter-bar, .search-bar, .period, .tx-list, .header,
-  .menu-user, .menu-shortcuts, .menu-search, .menu-tabs, .menu-section {
-    max-width: 720px; margin-left: auto; margin-right: auto;
+/* 컴퓨터·태블릿: 화면 가운데 휴대폰 틀 */
+@media (min-width: 500px) {
+  body { display: grid; place-items: center; padding: 24px; background: #dee2e6; }
+  :root[data-theme="dark"] body { background: #000; }
+  .device {
+    width: 390px; height: min(844px, calc(100dvh - 48px));
+    border: 10px solid #15171a; border-radius: 46px; overflow: hidden;
+    box-shadow: 0 0 0 2px #2f3237, 0 30px 60px rgba(0, 0, 0, 0.25);
   }
-  .menu-shortcuts, .menu-search { width: calc(100% - 32px); }
-  .step, .bottom-cta { max-width: 480px; margin: 0 auto; }
-}
-
-/* 데스크톱: 하단 탭바 → 왼쪽 사이드바, 홈 2단 */
-@media (min-width: 1024px) {
-  .app { padding-bottom: 32px; padding-left: 220px; }
-  .app--plain { padding-left: 0; }
-  .tabbar {
-    top: 0; right: auto; width: 220px; height: auto;
-    grid-template-columns: none; grid-auto-rows: 52px; align-content: start;
-    padding: 24px 12px; border-top: 0; border-right: 1px solid var(--line);
-  }
-  .tabbar::before { content: "연습뱅크"; font-size: 20px; font-weight: 800; color: var(--primary); padding: 0 12px 20px; }
-  .tabbar__item { flex-direction: row; justify-content: flex-start; gap: 12px; padding: 0 12px; border-radius: 12px; font-size: 15px; }
-  .tabbar__item:hover { background: var(--bg); }
-  .tabbar__item.is-active { background: var(--primary-soft); color: var(--primary-dark); }
-  .tabbar__circle { width: auto; height: auto; margin: 0; background: none; color: inherit; box-shadow: none; }
-  .header__logo { visibility: hidden; }
-  .home-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; align-items: start; }
-  .home-grid .section:first-child { margin-top: 0; }
-  .page, .header { max-width: 980px; }
-  .carousel > * { flex-basis: 100%; }
-  .toast { bottom: 32px; }
+  .statusbar { height: 34px; padding: 4px 26px 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

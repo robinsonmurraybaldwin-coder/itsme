@@ -84,7 +84,7 @@ export function mountMenu() {
       if (!visible) return;
       $$("#tabs .chip").forEach((c) => c.classList.toggle("is-active", c.dataset.target === visible.target.id));
     },
-    { rootMargin: "-70px 0px -70% 0px" }
+    { root: $(".scroller"), rootMargin: "-70px 0px -70% 0px" }
   );
 
   renderAll();
