@@ -9,77 +9,276 @@
 <body>
 <div class="app">
 
-  <!-- ===== 대시보드 화면 ===== -->
+  <!-- ============ 1. 대시보드 ============ -->
   <section id="screen-dashboard" class="screen active">
-    <header class="topbar">
-      <h1>DemoBank</h1>
+    <header class="topbar topbar-home">
+      <div class="todo">할 일 <span class="check">☑</span></div>
+      <div class="header-icons">
+        <span>🔔</span><span>🎧</span><span class="hamburger" data-open-menu>☰</span>
+      </div>
     </header>
 
     <div class="balance-card">
-      <div class="bank-badge" id="bank-name">-</div>
-      <div class="account-number" id="account-number">-</div>
-      <div class="balance" id="balance">0원</div>
-      <div class="card-actions">
-        <button id="btn-transfer" class="btn btn-primary">이체</button>
-        <button class="btn btn-secondary">ATM출금</button>
+      <div class="card-tabs">
+        <span class="card-tab active" id="bank-name">마이뱅크</span>
+        <span class="card-tab">다른금융</span>
+        <span class="easy-banking">📱 쉬운뱅킹</span>
       </div>
+      <div class="card-body">
+        <div class="product-row">
+          <span class="product-name" id="product-name">-</span>
+          <span class="dots">⋮</span>
+        </div>
+        <div class="account-number" id="account-number">-</div>
+        <div class="balance-row">
+          <span class="balance" id="balance">0원</span>
+          <span class="refresh">↻</span>
+        </div>
+        <div class="card-actions">
+          <button id="btn-transfer" class="btn btn-primary">이체</button>
+          <button class="btn btn-secondary">ATM출금</button>
+        </div>
+      </div>
+    </div>
+    <div class="dots-indicator"><span class="dot active"></span><span class="dot"></span></div>
+
+    <div class="quick-links">
+      <button class="quick-link" data-screen="history"><span class="dot-icon purple">W</span>최근 이체내역 <span class="chev">›</span></button>
+      <span class="divider"></span>
+      <button class="quick-link"><span class="dot-icon blue">🪪</span>신분증·지갑 <span class="chev">›</span></button>
     </div>
 
     <h2 class="section-title">나만의 맞춤메뉴</h2>
     <div class="quick-menu">
       <div class="quick-menu-item"><span class="icon">🔍</span>전체계좌조회</div>
-      <div class="quick-menu-item"><span class="icon">💰</span>포인트</div>
-      <div class="quick-menu-item"><span class="icon">🛡️</span>보안카드</div>
-      <div class="quick-menu-item"><span class="icon">➕</span>추가</div>
+      <div class="quick-menu-item"><span class="icon">🪙</span>포인트</div>
+      <div class="quick-menu-item"><span class="icon">🛡️</span>카드</div>
+      <div class="quick-menu-item muted"><span class="icon">＋</span>추가</div>
     </div>
   </section>
 
-  <!-- ===== 이체내역 화면 ===== -->
+  <!-- ============ 2. 받는사람 선택 ============ -->
+  <section id="screen-pick" class="screen">
+    <header class="topbar">
+      <button class="back-btn" data-back="dashboard">‹</button>
+      <h1>이체</h1>
+      <span class="hamburger">☰</span>
+    </header>
+    <p class="question">누구에게 보낼까요?</p>
+
+    <label class="field-label">입금계좌</label>
+    <div class="input-with-icon">
+      <input type="text" id="pick-account" placeholder="계좌번호 입력" />
+      <span>📷</span>
+    </div>
+    <div class="inline-links">
+      <a href="#">👤 연락처 이체</a><a href="#">🔍 계좌 검색</a>
+    </div>
+
+    <div class="segment">
+      <button class="segment-btn active">계좌번호</button>
+      <button class="segment-btn">즐겨찾기</button>
+    </div>
+
+    <div class="row-dropdown">내 계좌 <span class="chev">⌄</span></div>
+
+    <div class="row-dropdown">최근 이체 <span id="recent-count"></span><span class="chev">⌃</span></div>
+    <ul id="recipient-list" class="recipient-list"></ul>
+  </section>
+
+  <!-- ============ 3. 금액 입력 ============ -->
+  <section id="screen-amount" class="screen">
+    <header class="topbar">
+      <button class="back-btn" data-back="pick">‹</button>
+      <h1>이체</h1>
+      <span class="cancel-link" data-back="dashboard">취소</span>
+    </header>
+
+    <p class="field-label">내 계좌에서</p>
+    <div class="account-chip">
+      <span class="bank-dot" id="amount-from-bank">마</span>
+      <div>
+        <div class="chip-main" id="amount-from-account">-</div>
+        <div class="chip-sub">출금가능금액 <span id="amount-from-balance">0원</span></div>
+      </div>
+    </div>
+
+    <p class="field-label">받는 분 계좌로</p>
+    <div class="account-chip">
+      <span class="bank-dot" id="amount-to-bank">?</span>
+      <div>
+        <div class="chip-main" id="amount-to-name">-</div>
+        <div class="chip-sub" id="amount-to-account">-</div>
+      </div>
+      <a href="#" class="change-link" data-back="pick">변경</a>
+    </div>
+
+    <div class="amount-display" id="amount-display">0<span class="won-suffix">원</span></div>
+    <div class="amount-korean" id="amount-korean">&nbsp;</div>
+
+    <a href="#" class="guide-link">이용안내</a>
+    <label class="checkbox-row"><input type="checkbox" />예약이체</label>
+
+    <div class="quick-amount">
+      <button type="button" data-add="10000">+1만</button>
+      <button type="button" data-add="50000">+5만</button>
+      <button type="button" data-add="100000">+10만</button>
+      <button type="button" data-add="1000000">+100만</button>
+      <button type="button" id="btn-reset-amount">전액</button>
+    </div>
+
+    <button id="btn-amount-next" class="btn btn-primary btn-block" disabled>다음</button>
+  </section>
+
+  <!-- ============ 4. 이체 확인 ============ -->
+  <section id="screen-confirm" class="screen">
+    <header class="topbar">
+      <button class="back-btn" data-back="amount">‹</button>
+      <h1>이체</h1>
+      <span class="cancel-link" data-back="dashboard">취소</span>
+    </header>
+
+    <div class="confirm-icons">
+      <span class="bank-dot" id="confirm-from-bank">마</span>
+      <span class="arrow">→</span>
+      <span class="bank-dot" id="confirm-to-bank">?</span>
+    </div>
+    <h2 class="confirm-title"><span id="confirm-name">-</span>님께</h2>
+    <p class="confirm-amount"><span id="confirm-amount">0원</span>을 보낼까요?</p>
+    <p class="confirm-amount-korean" id="confirm-amount-korean">&nbsp;</p>
+
+    <div class="info-row">
+      <span class="info-label">출금계좌</span>
+      <span class="info-value" id="confirm-from-account">-</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">내 통장 표기</span>
+      <span class="info-value">송금인 ›</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">받는 분 통장 표기</span>
+      <span class="info-value"><span id="confirm-to-display">-</span> ›</span>
+    </div>
+    <div class="row-dropdown small">추가정보입력 <span class="chev">⌄</span></div>
+
+    <p class="fee-note" id="fee-note">마이뱅크는 평생 수수료 무료!</p>
+    <button id="btn-send" class="btn btn-primary btn-block">보내기</button>
+  </section>
+
+  <!-- ============ 5. 이체 완료 ============ -->
+  <section id="screen-success" class="screen">
+    <header class="topbar">
+      <h1>이체</h1>
+    </header>
+    <div class="success-check">✓</div>
+    <h2 class="success-title"><span id="success-name">-</span>님께</h2>
+    <p class="success-amount"><span id="success-amount">0원</span>을 보냈어요 <span class="star">☆</span></p>
+
+    <div class="info-row">
+      <span class="info-label">출금계좌</span>
+      <span class="info-value" id="success-from-account">-</span>
+    </div>
+    <div class="info-row">
+      <span class="info-label">입금계좌</span>
+      <span class="info-value" id="success-to-account">-</span>
+    </div>
+    <div class="row-dropdown small">자세히보기 <span class="chev">⌄</span></div>
+
+    <button class="link-btn" data-screen="history">거래내역조회</button>
+    <div class="success-actions">
+      <button class="btn btn-secondary">공유</button>
+      <button class="btn btn-primary" data-back="dashboard">확인</button>
+    </div>
+  </section>
+
+  <!-- ============ 6. 거래내역조회 ============ -->
   <section id="screen-history" class="screen">
     <header class="topbar">
-      <button class="back-btn" data-back="dashboard">&lt;</button>
-      <h1>이체내역조회</h1>
+      <button class="back-btn" data-back="dashboard">‹</button>
+      <h1>거래내역조회</h1>
+      <span class="hamburger">☰</span>
     </header>
+
+    <div class="history-account-card">
+      <div>
+        <div class="chip-main" id="history-product">-</div>
+        <div class="chip-sub" id="history-account">-</div>
+      </div>
+      <div class="history-account-actions">
+        <button class="btn btn-outline">채우기</button>
+        <button class="btn btn-primary" data-screen="pick">이체</button>
+      </div>
+    </div>
+    <div class="inline-links tight">
+      <a href="#">간편이체내역</a><a href="#">예약이체내역</a><a href="#">ATM출금내역</a>
+    </div>
+
+    <div class="row-dropdown small">1개월 · 전체 · 최신순 <span class="chev">⌄</span></div>
+    <p class="date-range" id="date-range">-</p>
+
     <ul id="history-list" class="history-list"></ul>
   </section>
 
-  <!-- ===== 이체 화면 ===== -->
-  <section id="screen-transfer" class="screen">
-    <header class="topbar">
-      <button class="back-btn" data-back="dashboard">&lt;</button>
-      <h1>이체</h1>
-    </header>
-
-    <form id="transfer-form" class="transfer-form">
-      <label>
-        받는 분 이름
-        <input type="text" id="to-name" placeholder="홍길동" required />
-      </label>
-      <label>
-        받는 분 계좌번호
-        <input type="text" id="to-account" placeholder="123-456-789012" required />
-      </label>
-
-      <div class="amount-display" id="amount-display">0원</div>
-      <input type="hidden" id="amount" value="0" />
-
-      <div class="quick-amount">
-        <button type="button" data-add="10000">+1만</button>
-        <button type="button" data-add="50000">+5만</button>
-        <button type="button" data-add="100000">+10만</button>
-        <button type="button" id="btn-reset-amount">초기화</button>
+  <!-- ============ 상세거래내역 바텀시트 ============ -->
+  <div id="detail-sheet" class="sheet-overlay">
+    <div class="sheet">
+      <div class="sheet-header">
+        <h3>상세거래내역</h3>
+        <button class="close-btn" data-close-sheet>✕</button>
       </div>
+      <div class="sheet-amount-row">
+        <div>
+          <div class="sheet-name" id="detail-name">-</div>
+          <div class="sheet-amount" id="detail-amount">-</div>
+        </div>
+        <button class="btn btn-outline small">다시이체</button>
+      </div>
+      <div class="detail-row"><span>거래일시</span><span id="detail-datetime">-</span></div>
+      <div class="detail-row"><span>거래구분</span><span id="detail-method">-</span></div>
+      <div class="detail-row"><span>거래내용</span><span id="detail-category">-</span></div>
+      <div class="detail-row"><span>상대은행</span><span id="detail-bank">-</span></div>
+      <div class="detail-row"><span>상대계좌</span><span id="detail-counter-account">-</span></div>
+      <div class="detail-row"><span>상대계좌 예금주명</span><span id="detail-holder">-</span></div>
+      <div class="detail-row memo-row">
+        <span>메모</span>
+        <span class="memo-input">최대 25자까지 입력 <button class="btn btn-outline tiny">등록</button></span>
+      </div>
+    </div>
+  </div>
 
-      <p id="transfer-error" class="error"></p>
-      <button type="submit" class="btn btn-primary btn-block">확인</button>
-    </form>
-  </section>
+  <!-- ============ 전체메뉴 ============ -->
+  <div id="menu-overlay" class="menu-overlay">
+    <header class="topbar menu-topbar">
+      <span>로그아웃</span>
+      <div class="header-icons"><span>🏠</span><span>⚙️</span><span data-close-menu>✕</span></div>
+    </header>
+    <p class="menu-greeting"><span id="menu-username">회원</span>님 ›</p>
+    <div class="menu-quicklinks">
+      <span>🎁 이벤트</span><span>🔒 인증/보안</span><span>☎️ 고객센터</span>
+    </div>
+    <div class="search-bar">🔍 검색어를 입력해 주세요.</div>
+    <div class="segment">
+      <button class="segment-btn active">최근</button>
+      <button class="segment-btn">조회</button>
+      <button class="segment-btn">이체/출금</button>
+      <button class="segment-btn">예적금</button>
+    </div>
+    <h4 class="section-title small">최근 이용 메뉴</h4>
+    <ul class="menu-list">
+      <li>전체계좌조회</li>
+      <li>거래내역조회</li>
+      <li>이체결과조회</li>
+      <li>해지계좌조회</li>
+    </ul>
+  </div>
 
-  <!-- ===== 하단 탭바 ===== -->
+  <!-- ============ 하단 탭바 ============ -->
   <nav class="tabbar">
-    <button class="tab active" data-screen="dashboard"><span class="icon">🏠</span>홈</button>
-    <button class="tab" data-screen="history"><span class="icon">📋</span>이체내역</button>
-    <button class="tab" data-screen="transfer"><span class="icon">💸</span>이체</button>
+    <button class="tab" data-screen="dashboard"><span class="icon">📊</span>자산</button>
+    <button class="tab" data-screen="dashboard"><span class="icon">🛍️</span>상품</button>
+    <button class="tab home active" data-screen="dashboard"><span class="fab">💬</span>톡톡송금</button>
+    <button class="tab" data-screen="dashboard"><span class="icon">🎁</span>혜택</button>
+    <button class="tab" data-screen="dashboard"><span class="icon">📈</span>주식</button>
   </nav>
 
 </div>
