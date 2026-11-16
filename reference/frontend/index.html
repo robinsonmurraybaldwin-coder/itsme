@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DemoBank</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="app">
+
+  <!-- ===== 대시보드 화면 ===== -->
+  <section id="screen-dashboard" class="screen active">
+    <header class="topbar">
+      <h1>DemoBank</h1>
+    </header>
+
+    <div class="balance-card">
+      <div class="bank-badge" id="bank-name">-</div>
+      <div class="account-number" id="account-number">-</div>
+      <div class="balance" id="balance">0원</div>
+      <div class="card-actions">
+        <button id="btn-transfer" class="btn btn-primary">이체</button>
+        <button class="btn btn-secondary">ATM출금</button>
+      </div>
+    </div>
+
+    <h2 class="section-title">나만의 맞춤메뉴</h2>
+    <div class="quick-menu">
+      <div class="quick-menu-item"><span class="icon">🔍</span>전체계좌조회</div>
+      <div class="quick-menu-item"><span class="icon">💰</span>포인트</div>
+      <div class="quick-menu-item"><span class="icon">🛡️</span>보안카드</div>
+      <div class="quick-menu-item"><span class="icon">➕</span>추가</div>
+    </div>
+  </section>
+
+  <!-- ===== 이체내역 화면 ===== -->
+  <section id="screen-history" class="screen">
+    <header class="topbar">
+      <button class="back-btn" data-back="dashboard">&lt;</button>
+      <h1>이체내역조회</h1>
+    </header>
+    <ul id="history-list" class="history-list"></ul>
+  </section>
+
+  <!-- ===== 이체 화면 ===== -->
+  <section id="screen-transfer" class="screen">
+    <header class="topbar">
+      <button class="back-btn" data-back="dashboard">&lt;</button>
+      <h1>이체</h1>
+    </header>
+
+    <form id="transfer-form" class="transfer-form">
+      <label>
+        받는 분 이름
+        <input type="text" id="to-name" placeholder="홍길동" required />
+      </label>
+      <label>
+        받는 분 계좌번호
+        <input type="text" id="to-account" placeholder="123-456-789012" required />
+      </label>
+
+      <div class="amount-display" id="amount-display">0원</div>
+      <input type="hidden" id="amount" value="0" />
+
+      <div class="quick-amount">
+        <button type="button" data-add="10000">+1만</button>
+        <button type="button" data-add="50000">+5만</button>
+        <button type="button" data-add="100000">+10만</button>
+        <button type="button" id="btn-reset-amount">초기화</button>
+      </div>
+
+      <p id="transfer-error" class="error"></p>
+      <button type="submit" class="btn btn-primary btn-block">확인</button>
+    </form>
+  </section>
+
+  <!-- ===== 하단 탭바 ===== -->
+  <nav class="tabbar">
+    <button class="tab active" data-screen="dashboard"><span class="icon">🏠</span>홈</button>
+    <button class="tab" data-screen="history"><span class="icon">📋</span>이체내역</button>
+    <button class="tab" data-screen="transfer"><span class="icon">💸</span>이체</button>
+  </nav>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
